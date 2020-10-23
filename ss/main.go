@@ -21,7 +21,8 @@ func main() {
 
 	flag.Parse()
 
-	st := station.Station{Addr: config.Addr}
+	cfg := station.Config{Addr: ":1234"}
+	st := station.NewStation(cfg)
 	st.Register("/ping", station.Ping{})
 	st.Start()
 }
