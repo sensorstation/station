@@ -2,13 +2,11 @@ package main
 
 import (
 	"flag"
-
-	sensors ".."
 )
 
 // Globals
 var (
-	config sensors.Config
+	config station.Config
 )
 
 func init() {
@@ -21,10 +19,10 @@ func main() {
 
 	flag.Parse()
 
-	sensors.Init()
+	station.Init()
 
 	// Start web server
-	www := sensors.WWW{}
+	www := station.WWW{}
 	www.Register("/ping", ping{})
 	www.Start("0.0.0.0:1234")
 }
