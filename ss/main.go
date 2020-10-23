@@ -2,6 +2,8 @@ package main
 
 import (
 	"flag"
+
+	station ".."
 )
 
 // Globals
@@ -19,10 +21,7 @@ func main() {
 
 	flag.Parse()
 
-	station.Init()
-
-	// Start web server
-	www := station.WWW{}
-	www.Register("/ping", ping{})
-	www.Start("0.0.0.0:1234")
+	st := station.Station{Addr: config.Addr}
+	st.Register("/ping", station.Ping{})
+	st.Start()
 }
