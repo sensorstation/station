@@ -4,7 +4,9 @@
 package station
 
 import (
+	"fmt"
 	"net/http"
+	"os"
 )
 
 type Station struct {
@@ -12,11 +14,16 @@ type Station struct {
 	Addr string
 
 	*http.Server
-	*GPIO
 }
 
 func NewStation(cfg Config) (s *Station) {
 	s = &Station{Addr: cfg.Addr}
+
+	if err := mainImpl(); err != nil {
+		fmt.Fprintf(os.Stderr, "gpio-list: %s.\n", err)
+		os.Exit(1)
+	}
+
 	return s
 }
 
