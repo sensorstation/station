@@ -34,6 +34,7 @@ func init() {
 	flag.StringVar(&config.Filename, "config", "~/.config/sensors.json", "Where to read and store config")
 	flag.BoolVar(&config.IgnoreGPIO, "ignore-gpio", false, "Ignore GPIO for computers without GPIO")
 	flag.BoolVar(&config.ShowSkipped, "show-skipped", false, "Show skipped driver periphs")
+
 }
 
 // ServeHTTP allows a user to get and possibly set the configuration

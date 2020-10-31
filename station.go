@@ -4,10 +4,8 @@
 package station
 
 import (
-	"fmt"
 	"log"
 	"net/http"
-	"os"
 )
 
 type Station struct {
@@ -17,14 +15,13 @@ type Station struct {
 	*http.Server
 }
 
-func NewStation(cfg Config) (s *Station) {
-	s = &Station{Addr: cfg.Addr}
-
-	if err := mainImpl(); err != nil {
-		fmt.Fprintf(os.Stderr, "gpio-list: %s.\n", err)
-		os.Exit(1)
+// NewStation creates a station that did not previously exist.
+// The ID will be populated with the MAC address of this node
+func NewStation(cfg *Configuration) (s *Station) {
+	s = &Station{
+		ID:   "0xdeadcafe",
+		Addr: cfg.Addr,
 	}
-
 	return s
 }
 

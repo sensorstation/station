@@ -4,7 +4,13 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"time"
+)
+
+const (
+	PIN_SOIL  = 32
+	PIN_HUM   = 12
+	PIN_SOLAR = 11
+	PIN_TEMPF = 36
 )
 
 var (
@@ -30,22 +36,25 @@ func main() {
 		log.Println("Ignoring GPIO")
 	}
 
+	// Get the readers
+	soil := NewSensor(PIN_SOIL)
+	hum := NewSensor(PIN_HUMIDITY)
+	temp := NewSensor(PIN_TEPMF)
+	solar := NewSensor(PIN_SOLAR)
+	rando := NewRandom()
+	rando := NewRandom()
+
+	// Now the publishers
+	rando := NewPublisher("data/deadcafe/rando")
+	randp := NewRando("data/deadcafe/randa")
+
+	log.Println("Create all of our Subscribers")
+
 	go web()
 	listen_loop()
 }
 
 func listen_loop() {
-
-	// TODO: create table of publishers
-	done := make(chan string)
-	rando := NewPeridocRandomDataGenerator(1*time.Second, "rand")
-	randoQ := rando.Publish(done)
-
-	rand2 := NewPeridocRandomDataGenerator(1*time.Second, "rand2")
-	rand2Q := rand2.Publish(done)
-
-	soil := NewSoilMoisture(1*time.Second, "soil")
-	soilQ := soil.Publish(done)
 
 	var d Data
 	mqttcli := mqtt()
