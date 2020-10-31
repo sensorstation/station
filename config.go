@@ -8,17 +8,21 @@ import (
 	"net/http"
 )
 
+type Config interface {
+	http.Handler
+	SaveFile(fname string) error
+	ReadFile(fname string) error
+}
+
 type Configuration struct {
 	Addr string
 	App  string
 
 	Debug     bool
 	DebugMQTT bool
-	DumpGPIO  bool
 	Filename  string
 
-	IgnoreGPIO  bool
-	ShowSkipped bool
+	IgnoreGPIO bool
 }
 
 var (
@@ -31,9 +35,10 @@ func init() {
 	flag.BoolVar(&config.Debug, "debug", false, "Start debugging")
 	flag.BoolVar(&config.DebugMQTT, "debug-mqtt", false, "Debugging MQTT messages")
 	flag.StringVar(&config.Filename, "config", "~/.config/sensors.json", "Where to read and store config")
+	flag.BoolVar(&config.IgnoreGPIO, "ignore-gpio", false, "Ignore the GPIO")
 }
 
-// ServeHTTP allows a user to get and possibly set the configuration
+// ServeHTTP provides a REST interface to the config structure
 func (c Configuration) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -49,7 +54,7 @@ func (c Configuration) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 // Save write the configuration to a file in JSON format
-func (c *Configuration) Save(fname string) error {
+func (c *Configuration) SaveFile(fname string) error {
 
 	jbuf, err := json.Marshal(c)
 	if err != nil {
@@ -66,7 +71,7 @@ func (c *Configuration) Save(fname string) error {
 }
 
 // Load the file from the file corresponding to the fname parameter
-func (c *Configuration) Load(fname string) error {
+func (c *Configuration) ReadFile(fname string) error {
 	buf, err := ioutil.ReadFile(fname)
 	if err != nil {
 		log.Printf("[ERROR]: failed to read file %s, %v", fname, err)
