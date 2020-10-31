@@ -17,7 +17,7 @@ func main() {
 	flag.Parse()
 
 	// Create the state configuration for this station.
-	cfg := station.Configuration{Addr: ":1234"}
+	cfg := station.Configuration{}
 
 	// Now create the station based on the given configuration
 	st := station.NewStation(&cfg)
