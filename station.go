@@ -5,6 +5,7 @@ package station
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 )
@@ -32,5 +33,6 @@ func (s *Station) Register(p string, h http.Handler) {
 }
 
 func (s *Station) Start() error {
+	log.Println("Starting Web server on ", s.Addr)
 	return http.ListenAndServe(s.Addr, nil)
 }

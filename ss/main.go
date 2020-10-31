@@ -19,10 +19,18 @@ func init() {
 
 func main() {
 
+	// Parse command line argumens and update the config as appropriate
 	flag.Parse()
 
+	// Create the state configuration for this station.
 	cfg := station.Config{Addr: ":1234"}
+
+	// Now create the station based on the given configuration
 	st := station.NewStation(cfg)
+
+	// Register our REST callbacks, specifically answer to pings
 	st.Register("/ping", station.Ping{})
+
+	// Now start our station server
 	st.Start()
 }
