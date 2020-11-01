@@ -38,6 +38,10 @@ func init() {
 	flag.BoolVar(&config.IgnoreGPIO, "ignore-gpio", false, "Ignore the GPIO")
 }
 
+func GetConfig() Configuration {
+	return config
+}
+
 // ServeHTTP provides a REST interface to the config structure
 func (c Configuration) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")

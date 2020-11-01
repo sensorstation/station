@@ -17,7 +17,7 @@ func main() {
 	flag.Parse()
 
 	// Create the state configuration for this station.
-	cfg := station.Configuration{}
+	cfg := station.GetConfig()
 
 	// Now create the station based on the given configuration
 	st := station.NewStation(&cfg)
@@ -26,6 +26,17 @@ func main() {
 	st.Register("/ping", station.Ping{})
 	st.Register("/config", station.Configuration{})
 
-	// Now start our station server
+	// Register our publishers with their respective readers
+
+	m := map[string]string{
+		//{"data/cafedead/tempf": "GPIO5"},
+		//{"data/cafedead/humidity": "GPIO6"},
+		//{"data/cafedead/solar": "GPIO9"},
+		//{"data/cafedead/soil": "GPIO10"},
+	}
+
+	for c, p := range m {
+		st.Publishers[c] = station.NewPublisher(c, station.GetPinReader(p))
+	}
 	st.Start()
 }

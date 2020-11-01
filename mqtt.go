@@ -8,9 +8,9 @@ import (
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 )
 
-func init() {
-	mqtcc = mqtt()
-}
+var (
+	mqttc MQTT.Client
+)
 
 func mqtt() MQTT.Client {
 	if config.Debug {
@@ -27,6 +27,5 @@ func mqtt() MQTT.Client {
 		fmt.Println(token.Error())
 		return nil
 	}
-	mesh_subscribe(client)
 	return client
 }

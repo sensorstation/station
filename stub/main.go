@@ -37,17 +37,6 @@ func main() {
 	}
 
 	// Get the readers
-	soil := NewSensor(PIN_SOIL)
-	hum := NewSensor(PIN_HUMIDITY)
-	temp := NewSensor(PIN_TEPMF)
-	solar := NewSensor(PIN_SOLAR)
-	rando := NewRandom()
-	rando := NewRandom()
-
-	// Now the publishers
-	rando := NewPublisher("data/deadcafe/rando")
-	randp := NewRando("data/deadcafe/randa")
-
 	log.Println("Create all of our Subscribers")
 
 	go web()
