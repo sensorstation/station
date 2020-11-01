@@ -28,5 +28,9 @@ func main() {
 
 	// Register our publishers with their respective readers
 	st.AddPublisher("data/cafedead/rando", station.NewRando())
+	st.AddPublisher("data/cafedead/humidity", station.NewRando())
+	st.AddPublisher("data/cafedead/solar", station.NewRando())
+	st.AddPublisher("data/cafedead/soil", station.NewRando())
+	st.AddPublisher("data/cafedead/tempf", station.NewRando())
 	st.Start()
 }

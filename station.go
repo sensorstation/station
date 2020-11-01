@@ -39,7 +39,7 @@ func (s *Station) Register(p string, h http.Handler) {
 // our REST API
 func (s *Station) Start() error {
 
-	log.Println("Connect to our ")
+	log.Println("Connect to our MQTT broker: ", config.Broker)
 	mqttc = mqtt_connect()
 	if mqttc == nil {
 		log.Fatal("Unable to connect to broker, TODO StandAlone mode")
