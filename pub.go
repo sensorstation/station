@@ -1,12 +1,16 @@
 package station
 
 import (
-	"io"
+	"fmt"
 	"log"
 	"time"
 
 	"periph.io/x/periph/conn/gpio"
 )
+
+type DataReader interface {
+	FetchData() string
+}
 
 // Publisher periodically reads from an io.Reader then publishes that value
 // to a corresponding channel
@@ -14,21 +18,18 @@ type Publisher struct {
 	Path   string
 	Period time.Duration
 	Pin    gpio.PinIO
-	io.Reader
+	DataReader
 
 	publishing bool
 }
 
-func NewPublisher(p string, r io.Reader) (pub *Publisher) {
+func NewPublisher(p string, r DataReader) (pub *Publisher) {
 	pub = &Publisher{
-		Path:   p,
-		Period: 5 * time.Second,
+		Path:       p,
+		Period:     5 * time.Second,
+		DataReader: r,
 	}
 	return pub
-}
-
-func (p *Publisher) Stop() {
-	p.publishing = false
 }
 
 // Publish will start producing data from the given data producer via
@@ -43,21 +44,20 @@ func (p *Publisher) Publish(done chan string) {
 		for p.publishing {
 			select {
 			case <-done:
-				p.Stop()
+				p.publishing = false
 				log.Println("Random Data recieved a DONE, returning")
 				break
 
 			case <-ticker.C:
-				var buf []byte
-				n, err := p.Read(buf)
-				if err == nil {
-					log.Printf("ERROR publish [%s] value %+v", p.Path, buf)
-					continue
+				d := p.FetchData()
+				if d != "" {
+					fmt.Printf("publish %s -> %+v\n", p.Path, d)
+					if t := mqttc.Publish(p.Path, byte(0), false, d); t != nil {
+						log.Printf("token: %+v\n", t)
+					} else {
+						log.Println("I have a NULL token")
+					}
 				}
-				if config.Debug {
-					log.Printf("chan %s published %d bytes: %+v", p.Path, n, buf)
-				}
-				mqttc.Publish(p.Path, byte(0), false, buf)
 			}
 		}
 	}()

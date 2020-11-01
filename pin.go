@@ -24,12 +24,13 @@ func GetPinReader(name string) (p PinReader) {
 	return p
 }
 
-func (p PinReader) Read(buf []byte) (n int, err error) {
+func (p PinReader) FetchData() interface{} {
+	var o bool
 	l := p.PinIO.Read()
 	if l == gpio.Low {
-		buf = append(buf, 0)
+		o = false
 	} else {
-		buf = append(buf, 1)
+		o = true
 	}
-	return len(buf), nil
+	return o
 }

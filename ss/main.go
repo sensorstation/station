@@ -27,16 +27,6 @@ func main() {
 	st.Register("/config", station.Configuration{})
 
 	// Register our publishers with their respective readers
-
-	m := map[string]string{
-		//{"data/cafedead/tempf": "GPIO5"},
-		//{"data/cafedead/humidity": "GPIO6"},
-		//{"data/cafedead/solar": "GPIO9"},
-		//{"data/cafedead/soil": "GPIO10"},
-	}
-
-	for c, p := range m {
-		st.Publishers[c] = station.NewPublisher(c, station.GetPinReader(p))
-	}
+	st.AddPublisher("data/cafedead/rando", station.NewRando())
 	st.Start()
 }

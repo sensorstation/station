@@ -15,8 +15,9 @@ type Config interface {
 }
 
 type Configuration struct {
-	Addr string
-	App  string
+	Addr   string
+	App    string
+	Broker string
 
 	Debug     bool
 	DebugMQTT bool
@@ -32,10 +33,12 @@ var (
 func init() {
 	flag.StringVar(&config.Addr, "addr", "0.0.0.0:8011", "Address to listen for web connections")
 	flag.StringVar(&config.App, "app", "../app/dist", "Directory for the web app distribution")
+	flag.StringVar(&config.Broker, "broker", "tcp://10.24.4.4:1883", "Address of MQTT broker")
 	flag.BoolVar(&config.Debug, "debug", false, "Start debugging")
 	flag.BoolVar(&config.DebugMQTT, "debug-mqtt", false, "Debugging MQTT messages")
 	flag.StringVar(&config.Filename, "config", "~/.config/sensors.json", "Where to read and store config")
 	flag.BoolVar(&config.IgnoreGPIO, "ignore-gpio", false, "Ignore the GPIO")
+
 }
 
 func GetConfig() Configuration {

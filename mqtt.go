@@ -12,13 +12,13 @@ var (
 	mqttc MQTT.Client
 )
 
-func mqtt() MQTT.Client {
+func mqtt_connect() MQTT.Client {
 	if config.Debug {
 		MQTT.DEBUG = log.New(os.Stdout, "", 0)
 		MQTT.ERROR = log.New(os.Stdout, "", 0)
 	}
 
-	server := "tcp://10.24.10.10:1883" // XXX move to config
+	server := config.Broker
 	id := "sensorStation"
 	connOpts := MQTT.NewClientOptions().AddBroker(server).SetClientID(id).SetCleanSession(true)
 
