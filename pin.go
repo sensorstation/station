@@ -9,7 +9,7 @@ import (
 
 var readers map[string]*PinReader
 
-type PinReader struct {
+type PinWR struct {
 	gpio.PinIO
 }
 
@@ -24,7 +24,7 @@ func GetPinReader(name string) (p PinReader) {
 	return p
 }
 
-func (p PinReader) FetchData() interface{} {
+func (p PinWR) FetchData() interface{} {
 	var o bool
 	l := p.PinIO.Read()
 	if l == gpio.Low {
@@ -33,4 +33,15 @@ func (p PinReader) FetchData() interface{} {
 		o = true
 	}
 	return o
+}
+
+func (p PinWR) SetData(d interface{}) (err error) {
+
+	return err
+}
+
+func (p PinWR) SetLevel(l gpio.Level) (err error) {
+
+	
+	return err
 }

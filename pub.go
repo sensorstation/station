@@ -4,20 +4,13 @@ import (
 	"fmt"
 	"log"
 	"time"
-
-	"periph.io/x/periph/conn/gpio"
 )
-
-type DataReader interface {
-	FetchData() string
-}
 
 // Publisher periodically reads from an io.Reader then publishes that value
 // to a corresponding channel
 type Publisher struct {
 	Path   string
 	Period time.Duration
-	Pin    gpio.PinIO
 	DataReader
 
 	publishing bool

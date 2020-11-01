@@ -32,5 +32,11 @@ func main() {
 	st.AddPublisher("data/cafedead/solar", station.NewRando())
 	st.AddPublisher("data/cafedead/soil", station.NewRando())
 	st.AddPublisher("data/cafedead/tempf", station.NewRando())
+
+	// st.AddController("control/cafedead/light", station.NewRelay())
+	// st.AddController("control/cafedead/heater", station.NewRelay())
+	// st.AddController("control/cafedead/sprinkler", station.NewRelay())
+	// st.AddController("control/cafedead/door", station.NewRelay())
+	
 	st.Start()
 }
