@@ -1,15 +1,12 @@
 package station
 
-
 type Controller struct {
-	Path string
+	Setter
 }
 
-func AddController(p string, ds DataSetter) {
-	
-}
-
-func (c *Controller) SetData(d interface{}) (err error) {
-
-	return err
+func NewController(p string, d Setter) *Controller {
+	c := &Controller{
+		Setter: d,
+	}
+	return c
 }

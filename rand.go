@@ -19,17 +19,17 @@ func NewRando() (r *Rando) {
 	return r
 }
 
-func (p Rando) FetchData() string {
+func (p Rando) Get() interface{} {
 	p.F = rand.Float64()
 	s := fmt.Sprintf("%f", p.F)
 	return s
 }
 
-func (p Rando) FetchFloat() float64 {
+func (p Rando) GetFloat() float64 {
 	return rand.Float64()
 }
 
 func (p Rando) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	p.FetchData()
+	p.Get()
 	fmt.Fprintf(w, "%f", p.F)
 }

@@ -6,13 +6,19 @@ package station
 import (
 	"log"
 	"net/http"
+
+	"periph.io/x/periph"
+	"periph.io/x/periph/host"
 )
 
 type Station struct {
 	ID   string // MAC address
 	Addr string
 	*http.Server
-	Publishers map[string]*Publisher
+	*periph.State
+
+	Publishers  map[string]*Publisher
+	Subscribers map[string]*Subscriber
 
 	Done chan string
 }
@@ -21,10 +27,18 @@ type Station struct {
 // The ID will be populated with the MAC address of this node
 func NewStation(cfg *Configuration) (s *Station) {
 	s = &Station{
-		ID:         "0xdeadcafe", // MUST get MAC Address
-		Addr:       cfg.Addr,
-		Publishers: make(map[string]*Publisher, 10),
-		Done:       make(chan string),
+		ID:          "0xdeadcafe", // MUST get MAC Address
+		Addr:        cfg.Addr,
+		Publishers:  make(map[string]*Publisher, 10),
+		Subscribers: make(map[string]*Subscriber, 10),
+		Done:        make(chan string),
+	}
+
+	var err error
+	s.State, err = host.Init()
+	if err != nil {
+		log.Printf("Initializing GPIO failed - no GPIO")
+		s.State = nil
 	}
 	return s
 }
@@ -45,6 +59,11 @@ func (s *Station) Start() error {
 		log.Fatal("Unable to connect to broker, TODO StandAlone mode")
 	}
 
+	log.Println("Subscribers: ", len(s.Subscribers))
+	for _, p := range s.Subscribers {
+		log.Println("\t" + p.Path)
+	}
+
 	log.Println("Starting publishers: ", len(s.Publishers))
 	for _, p := range s.Publishers {
 		log.Println("\t" + p.Path)
@@ -57,6 +76,11 @@ func (s *Station) Start() error {
 
 // NewPublisher adds a publisher to the station, which will subsequently
 // start publishing the data
-func (s *Station) AddPublisher(path string, r DataReader) {
+func (s *Station) AddPublisher(path string, r Getter) {
 	s.Publishers[path] = NewPublisher(path, r)
+}
+
+func (s *Station) Subscribe(path string, f MsgHandler) {
+	sub := &Subscriber{path, f}
+	s.Subscribers[path] = sub
 }

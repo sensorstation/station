@@ -1,10 +1,9 @@
 package station
 
-type DataReader interface {
-	FetchData() interface{}
+type Getter interface {
+	Get() interface{}
 }
 
-type DataSetter interface {
-	SetData(d interface{}) error
+type Setter interface {
+	Set(d interface{})
 }
-

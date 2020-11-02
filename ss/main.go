@@ -33,10 +33,10 @@ func main() {
 	st.AddPublisher("data/cafedead/soil", station.NewRando())
 	st.AddPublisher("data/cafedead/tempf", station.NewRando())
 
-	// st.AddController("control/cafedead/light", station.NewRelay())
-	// st.AddController("control/cafedead/heater", station.NewRelay())
-	// st.AddController("control/cafedead/sprinkler", station.NewRelay())
-	// st.AddController("control/cafedead/door", station.NewRelay())
-	
+	st.Subscribe("ctl/cafedead/pump", station.GetRelay("GPIO3"))
+	st.Subscribe("ctl/cafedead/light", station.GetRelay("GPIO4"))
+	st.Subscribe("ctl/cafedead/heater", station.GetRelay("GPIO8"))
+	st.Subscribe("ctl/cafedead/fan", station.GetRelay("GPIO11"))
+
 	st.Start()
 }
