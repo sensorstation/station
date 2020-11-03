@@ -1,3 +1,6 @@
-# Sensors
+# Sensor Station
 
-Handle publish and subscription of sensor data and control commands.
+Sensor Station is an Open Framework intended to help faciliate the
+develop and deploy _Intelligent Online Techinologies (IoT)_.
+
+

@@ -23,6 +23,7 @@ func main() {
 	st := station.NewStation(&cfg)
 
 	// Register our REST callbacks, specifically answer to pings
+	st.Register("/ws", station.WServ)
 	st.Register("/ping", station.Ping{})
 	st.Register("/config", station.Configuration{})
 
