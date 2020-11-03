@@ -45,7 +45,7 @@ func (p *Publisher) Publish(done chan string) {
 				if d != "" {
 					fmt.Printf("publish %s -> %+v\n", p.Path, d)
 					if t := mqttc.Publish(p.Path, byte(0), false, d); t == nil {
-						log.Printf("I have a NULL token: %s, %+v", p.Path, d)
+						log.Printf("%v - I have a NULL token: %s, %+v", mqttc, p.Path, d)
 					}
 				}
 			}

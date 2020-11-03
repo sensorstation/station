@@ -9,8 +9,6 @@ import (
 	"periph.io/x/periph/conn/gpio/gpioreg"
 )
 
-var readers map[string]*PinWR
-
 type PinWR struct {
 	gpio.PinIO
 }
@@ -35,6 +33,10 @@ func (p PinWR) Get() interface{} {
 		o = true
 	}
 	return o
+}
+
+func (p PinWR) GetLevel() gpio.Level {
+	return p.PinIO.Read()
 }
 
 func (p PinWR) Set(i interface{}) {

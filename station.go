@@ -19,8 +19,9 @@ type Station struct {
 	*periph.State
 	mqttc *mqtt.Client
 
-	Publishers  map[string]*Publisher
-	Subscribers map[string]*Subscriber
+	Publishers   map[string]*Publisher
+	Subscribers  map[string]*Subscriber
+	Applications map[string]Application
 
 	Done chan string
 }
@@ -86,6 +87,16 @@ func (s *Station) AddPublisher(path string, r Getter) {
 	s.Publishers[path] = NewPublisher(path, r)
 }
 
+// NewPublisher adds a publisher to the station, which will subsequently
+// start publishing the data
+func (s *Station) AddApplication(app Application) {
+	name := app.Name()
+	if s.Applications == nil {
+		s.Applications = make(map[string]Application, 4)
+	}
+	s.Applications[name] = NewApp(name)
+}
+
 func (s *Station) Subscribe(path string, f mqtt.MessageHandler) {
 	sub := &Subscriber{path, f}
 	s.Subscribers[path] = sub
@@ -94,7 +105,7 @@ func (s *Station) Subscribe(path string, f mqtt.MessageHandler) {
 	if token := mqttc.Subscribe(path, byte(qos), f); token.Wait() && token.Error() != nil {
 		panic(token.Error())
 	} else {
-		log.Printf("\tsubscribe token: %v", token)
+		log.Printf("subscribe token: %v", token)
 	}
 	log.Println("Subscribed to ", path)
 }

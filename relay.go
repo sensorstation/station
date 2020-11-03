@@ -40,7 +40,6 @@ func (rel *Relay) MessageHandler(c mqtt.Client, m mqtt.Message) {
 		log.Printf("ERROR: relay message handler unknown message: %+v", str)
 		return
 	}
-
 	if p[0] == byte(1) {
 		l = gpio.High
 	}
