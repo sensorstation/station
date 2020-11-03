@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"periph.io/x/periph"
 	"periph.io/x/periph/host"
 )
@@ -16,6 +17,7 @@ type Station struct {
 	Addr string
 	*http.Server
 	*periph.State
+	mqttc *mqtt.Client
 
 	Publishers  map[string]*Publisher
 	Subscribers map[string]*Subscriber
@@ -32,6 +34,11 @@ func NewStation(cfg *Configuration) (s *Station) {
 		Publishers:  make(map[string]*Publisher, 10),
 		Subscribers: make(map[string]*Subscriber, 10),
 		Done:        make(chan string),
+	}
+
+	mqttc = mqtt_connect()
+	if mqttc == nil {
+		log.Fatalf("Failed to connect to MQTT broker")
 	}
 
 	var err error
@@ -54,7 +61,6 @@ func (s *Station) Register(p string, h http.Handler) {
 func (s *Station) Start() error {
 
 	log.Println("Connect to our MQTT broker: ", config.Broker)
-	mqttc = mqtt_connect()
 	if mqttc == nil {
 		log.Fatal("Unable to connect to broker, TODO StandAlone mode")
 	}
@@ -80,7 +86,15 @@ func (s *Station) AddPublisher(path string, r Getter) {
 	s.Publishers[path] = NewPublisher(path, r)
 }
 
-func (s *Station) Subscribe(path string, f MsgHandler) {
+func (s *Station) Subscribe(path string, f mqtt.MessageHandler) {
 	sub := &Subscriber{path, f}
 	s.Subscribers[path] = sub
+
+	qos := 0
+	if token := mqttc.Subscribe(path, byte(qos), f); token.Wait() && token.Error() != nil {
+		panic(token.Error())
+	} else {
+		log.Printf("\tsubscribe token: %v", token)
+	}
+	log.Println("Subscribed to ", path)
 }

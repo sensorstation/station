@@ -39,17 +39,15 @@ func (p PinWR) Get() interface{} {
 
 func (p PinWR) Set(i interface{}) {
 	d := i.(gpio.Level)
-	p.PinIO.Out(d)
+	p.Out(d)
 }
 
 func (p PinWR) SetLevel(l gpio.Level) {
 	p.PinIO.Out(l)
 }
 
-func (p PinWR) MsgHandler(c mqtt.Client, m mqtt.Message) {
-	if config.Debug {
-		log.Printf("Received message on topic: %s\nMessage: %s\n", m.Topic(), m.Payload())
-	}
+func (p PinWR) MessageHandler(c mqtt.Client, m mqtt.Message) {
+	log.Printf("Received message on topic: %s\nMessage: %s\n", m.Topic(), m.Payload())
 }
 
 type FakePin struct {

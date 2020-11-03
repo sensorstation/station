@@ -33,10 +33,17 @@ func main() {
 	st.AddPublisher("data/cafedead/soil", station.NewRando())
 	st.AddPublisher("data/cafedead/tempf", station.NewRando())
 
-	st.Subscribe("ctl/cafedead/pump", station.GetRelay("GPIO3"))
-	st.Subscribe("ctl/cafedead/light", station.GetRelay("GPIO4"))
-	st.Subscribe("ctl/cafedead/heater", station.GetRelay("GPIO8"))
-	st.Subscribe("ctl/cafedead/fan", station.GetRelay("GPIO11"))
+	rel1 := station.GetRelay("GPIO16")
+	st.Subscribe("ctl/cafedead/pump", rel1.MessageHandler)
+
+	rel2 := station.GetRelay("GPIO7")
+	st.Subscribe("ctl/cafedead/light", rel2.MessageHandler)
+
+	rel3 := station.GetRelay("GPIO8")
+	st.Subscribe("ctl/cafedead/heater", rel3.MessageHandler)
+
+	rel4 := station.GetRelay("GPIO24")
+	st.Subscribe("ctl/cafedead/fan", rel4.MessageHandler)
 
 	st.Start()
 }

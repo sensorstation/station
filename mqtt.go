@@ -5,27 +5,26 @@ import (
 	"log"
 	"os"
 
-	MQTT "github.com/eclipse/paho.mqtt.golang"
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
 var (
-	mqttc MQTT.Client
+	mqttc mqtt.Client
 )
 
-func mqtt_connect() MQTT.Client {
-	if config.Debug {
-		MQTT.DEBUG = log.New(os.Stdout, "", 0)
-		MQTT.ERROR = log.New(os.Stdout, "", 0)
+func mqtt_connect() mqtt.Client {
+	if config.DebugMQTT {
+		mqtt.DEBUG = log.New(os.Stdout, "", 0)
+		mqtt.ERROR = log.New(os.Stdout, "", 0)
 	}
 
-	server := config.Broker
 	id := "sensorStation"
-	connOpts := MQTT.NewClientOptions().AddBroker(server).SetClientID(id).SetCleanSession(true)
+	connOpts := mqtt.NewClientOptions().AddBroker(config.Broker).SetClientID(id).SetCleanSession(true)
 
-	client := MQTT.NewClient(connOpts)
-	if token := client.Connect(); token.Wait() && token.Error() != nil {
+	mqttc = mqtt.NewClient(connOpts)
+	if token := mqttc.Connect(); token.Wait() && token.Error() != nil {
 		fmt.Println(token.Error())
 		return nil
 	}
-	return client
+	return mqttc
 }
