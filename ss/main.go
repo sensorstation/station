@@ -58,8 +58,8 @@ func main() {
 	t0.Subscribe("data/cafedead/soil", t0.MessageHandler)
 	st.AddApplication(t0)
 
-	s := station.GetToggle("ctl/cafedead/solar")
-	s.Subscribe("data/cafedead/light", s.MessageHandler)
+	s := station.GetToggle("ctl/cafedead/light")
+	s.Subscribe("data/cafedead/solar", s.MessageHandler)
 	st.AddApplication(s)
 
 	s2 := station.GetToggle("ctl/cafedead/heater")
