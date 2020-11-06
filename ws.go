@@ -49,21 +49,24 @@ func (ws WSServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	quoteCallbacks[c] = cb
-
 	defer func() { delete(quoteCallbacks, c) }()
-	func() {
-		for {
+
+	go func() {
+		running := true
+		for running {
 
 			select {
 			case now := <-tQ:
 				t := NewTimeMsg(now)
 
 				if config.Debug {
-					log.Printf("Sending the time %+v", t)
+					log.Printf("Sending time %q", t)
 				}
+
 				err = wsjson.Write(r.Context(), c, t)
 				if err != nil {
 					log.Println("ERROR: ", err)
+					running = false
 				}
 			}
 		}
@@ -80,7 +83,7 @@ func (ws WSServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			log.Println("ERROR: reading websocket ", err)
 			return
 		}
-		log.Println("incoming: %s", string(data))
+		log.Printf("incoming: %s", string(data))
 	}
 
 }

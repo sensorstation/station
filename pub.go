@@ -1,7 +1,6 @@
 package station
 
 import (
-	"fmt"
 	"log"
 	"time"
 )
@@ -43,11 +42,13 @@ func (p *Publisher) Publish(done chan string) {
 			case <-ticker.C:
 				d := p.Get()
 				if d != "" {
-					fmt.Printf("publish %s -> %+v\n", p.Path, d)
 					if t := mqttc.Publish(p.Path, byte(0), false, d); t == nil {
-						log.Printf("%v - I have a NULL token: %s, %+v", mqttc, p.Path, d)
+						if config.Debug {
+							log.Printf("%v - I have a NULL token: %s, %+v", mqttc, p.Path, d)
+						}
 					}
 				}
+				log.Printf("publish %s -> %+v\n", p.Path, d)
 			}
 		}
 	}()
