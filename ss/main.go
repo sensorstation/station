@@ -27,29 +27,32 @@ func main() {
 	st.Register("/ping", station.Ping{})
 	st.Register("/config", station.Configuration{})
 
-	// ----------------------------------------------------------
-	// Register our publishers with their respective readers
-	// ----------------------------------------------------------
-	st.AddPublisher("data/cafedead/rando", station.NewRando())
-	st.AddPublisher("data/cafedead/humidity", station.NewRando())
-	st.AddPublisher("data/cafedead/solar", station.NewRando())
-	st.AddPublisher("data/cafedead/soil", station.NewRando())
-	st.AddPublisher("data/cafedead/tempf", station.NewRando())
+	if config.GPIO {
+		
+		// ----------------------------------------------------------
+		// Register our publishers with their respective readers
+		// ----------------------------------------------------------
+		st.AddPublisher("data/cafedead/rando", station.NewRando())
+		st.AddPublisher("data/cafedead/humidity", station.NewRando())
+		st.AddPublisher("data/cafedead/solar", station.NewRando())
+		st.AddPublisher("data/cafedead/soil", station.NewRando())
+		st.AddPublisher("data/cafedead/tempf", station.NewRando())
 
-	// ----------------------------------------------------------
-	// Register our local controls
-	// ----------------------------------------------------------
-	rel1 := station.GetRelay("GPIO16")
-	st.Subscribe("ctl/cafedead/pump", rel1.MessageHandler)
+		// ----------------------------------------------------------
+		// Register our local controls
+		// ----------------------------------------------------------
+		rel1 := station.GetRelay("GPIO16")
+		st.Subscribe("ctl/cafedead/pump", rel1.MessageHandler)
 
-	rel2 := station.GetRelay("GPIO7")
-	st.Subscribe("ctl/cafedead/light", rel2.MessageHandler)
+		rel2 := station.GetRelay("GPIO7")
+		st.Subscribe("ctl/cafedead/light", rel2.MessageHandler)
 
-	rel3 := station.GetRelay("GPIO8")
-	st.Subscribe("ctl/cafedead/heater", rel3.MessageHandler)
+		rel3 := station.GetRelay("GPIO8")
+		st.Subscribe("ctl/cafedead/heater", rel3.MessageHandler)
 
-	rel4 := station.GetRelay("GPIO24")
-	st.Subscribe("ctl/cafedead/fan", rel4.MessageHandler)
+		rel4 := station.GetRelay("GPIO24")
+		st.Subscribe("ctl/cafedead/fan", rel4.MessageHandler)
+	}
 
 	// ----------------------------------------------------------
 	// Register the apps
@@ -69,6 +72,5 @@ func main() {
 	s3 := station.GetToggle("ctl/cafedead/fan")
 	s3.Subscribe("data/cafedead/humidity", s3.MessageHandler)
 	st.AddApplication(s3)
-
 	st.Start()
 }

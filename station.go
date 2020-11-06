@@ -34,10 +34,11 @@ func NewStation(cfg *Configuration) (s *Station) {
 		Addr:        cfg.Addr,
 		Publishers:  make(map[string]*Publisher, 10),
 		Subscribers: make(map[string]*Subscriber, 10),
+		Applications: make(map[string]Application, 10),
 		Done:        make(chan string),
 	}
 
-	mqttc = mqtt_connect()
+	mqtt_connect()
 	if mqttc == nil {
 		log.Fatalf("Failed to connect to MQTT broker")
 	}

@@ -12,7 +12,7 @@ var (
 	mqttc mqtt.Client
 )
 
-func mqtt_connect() mqtt.Client {
+func mqtt_connect() {
 	if config.DebugMQTT {
 		mqtt.DEBUG = log.New(os.Stdout, "", 0)
 		mqtt.ERROR = log.New(os.Stdout, "", 0)
@@ -20,11 +20,8 @@ func mqtt_connect() mqtt.Client {
 
 	id := "sensorStation"
 	connOpts := mqtt.NewClientOptions().AddBroker(config.Broker).SetClientID(id).SetCleanSession(true)
-
 	mqttc = mqtt.NewClient(connOpts)
 	if token := mqttc.Connect(); token.Wait() && token.Error() != nil {
 		fmt.Println(token.Error())
-		return nil
 	}
-	return mqttc
 }
