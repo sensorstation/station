@@ -23,7 +23,7 @@ type Configuration struct {
 	DebugMQTT bool
 	Filename  string
 
-	IgnoreGPIO bool
+	GPIO bool
 }
 
 var (
@@ -37,8 +37,7 @@ func init() {
 	flag.BoolVar(&config.Debug, "debug", false, "Start debugging")
 	flag.BoolVar(&config.DebugMQTT, "debug-mqtt", false, "Debugging MQTT messages")
 	flag.StringVar(&config.Filename, "config", "~/.config/sensors.json", "Where to read and store config")
-	flag.BoolVar(&config.IgnoreGPIO, "ignore-gpio", false, "Ignore the GPIO")
-
+	flag.BoolVar(&config.GPIO, "gpio", false, "Ignore the GPIO")
 }
 
 func GetConfig() Configuration {

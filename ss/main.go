@@ -44,6 +44,5 @@ func main() {
 	t0 := station.GetToggle("ctl/cafedead/pump")
 	t0.Subscribe("data/cafedead/soil", t0.MessageHandler)
 	st.AddApplication(t0)
-
 	st.Start()
 }

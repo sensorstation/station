@@ -34,9 +34,9 @@ func (app App) Subscribe(topic string, f mqtt.MessageHandler) {
 
 	app.Subscriptions = append(app.Subscriptions, topic)
 	if token := mqttc.Subscribe(topic, byte(qos), f); token.Wait() && token.Error() != nil {
-		panic(token.Error())
+		log.Println("subscribe to ", topic, " failed ~ ", token.Error())
 	} else {
 		log.Printf("\tsubscribe token: %v", token)
 	}
-	log.Println("\t%s subscribed to %s ", app.Name, topic)
+	log.Printf("\t%s subscribed to %s ", app.Name, topic)
 }
