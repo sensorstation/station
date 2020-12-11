@@ -35,14 +35,14 @@ func main() {
 	// ----------------------------------------------------------
 	// Register our local controls
 	// ----------------------------------------------------------
-	rel1 := station.GetRelay("GPIO16")
-	st.Subscribe("ctl/cafedead/pump", rel1.MessageHandler)
+	// rel1 := station.GetRelay("GPIO16")
+	// st.Subscribe("ctl/cafedead/pump", rel1.MessageHandler)
 
 	// ----------------------------------------------------------
 	// Register the apps
 	// ----------------------------------------------------------
-	t0 := station.GetToggle("ctl/cafedead/pump")
-	t0.Subscribe("data/cafedead/soil", t0.MessageHandler)
-	st.AddApplication(t0)
+	// t0 := station.GetToggle("ctl/cafedead/pump")
+	// t0.Subscribe("data/cafedead/soil", t0.MessageHandler)
+	//  st.AddApplication(t0)
 	st.Start()
 }
