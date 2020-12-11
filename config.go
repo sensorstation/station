@@ -21,6 +21,7 @@ type Configuration struct {
 
 	Debug     bool
 	DebugMQTT bool
+	FakeWS	bool
 	Filename  string
 
 	GPIO bool
@@ -36,6 +37,7 @@ func init() {
 	flag.StringVar(&config.Broker, "broker", "tcp://localhost:1883", "Address of MQTT broker")
 	flag.BoolVar(&config.Debug, "debug", false, "Start debugging")
 	flag.BoolVar(&config.DebugMQTT, "debug-mqtt", false, "Debugging MQTT messages")
+	flag.BoolVar(&config.FakeWS, "fake-ws", false, "Fake websocket data")
 	flag.StringVar(&config.Filename, "config", "~/.config/sensors.json", "Where to read and store config")
 	flag.BoolVar(&config.GPIO, "gpio", false, "Ignore the GPIO")
 }
