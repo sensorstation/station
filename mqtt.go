@@ -25,3 +25,7 @@ func mqtt_connect() {
 		fmt.Println(token.Error())
 	}
 }
+
+func ToCloudCB(mc mqtt.Client, msg mqtt.Message) {
+	fmt.Printf("MC: %+v - MSG: %+v\n", mc, msg);
+}

@@ -27,10 +27,13 @@ func main() {
 	st.Register("/ping", station.Ping{})
 	st.Register("/config", station.Configuration{})
 
+	// Subscribe to our MQTT channels
+	st.Subscribe("mesh/#", station.ToCloudCB)
+
 	// ----------------------------------------------------------
 	// Register our publishers with their respective readers
 	// ----------------------------------------------------------
-	st.AddPublisher("data/cafedead/soil", station.NewRando())
+	// st.AddPublisher("data/cafedead/soil", station.NewRando())
 
 	// ----------------------------------------------------------
 	// Register our local controls
