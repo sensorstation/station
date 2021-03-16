@@ -27,8 +27,7 @@ func main() {
 	st.Register("/ping", station.Ping{})
 	st.Register("/config", station.Configuration{})
 
-	// Subscribe to our MQTT channels
-	st.Subscribe("mesh/#", station.ToCloudCB)
+	st.Subscribe("mesh/+/toCloud", station.ToCloudCB)
 
 	// ----------------------------------------------------------
 	// Register our publishers with their respective readers
