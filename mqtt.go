@@ -36,7 +36,7 @@ func mqtt_connect() {
 
 // ToCloudCB is the callback when we recieve MQTT messages on the '/mesh/xxxxxx/toCloud' channel. 
 func ToCloudCB(mc mqtt.Client, msg mqtt.Message) {
-	if config.Debug {
+	if false {
 		log.Printf("Incoming message topic: %s\n", msg.Topic());
 	}
 
@@ -58,9 +58,6 @@ func ToCloudCB(mc mqtt.Client, msg mqtt.Message) {
 		log.Fatal("Failed to unmarshal payload")
 	}
 
-	log.Println("addr: ", m.Addr)
-	log.Println("type: ", m.Type)
-	for k, v := range m.Data {
-		log.Println(k, ": ", v)
-	}
+	// TODO create a fully configured node and schedule network topology updates.
+	log.Printf("%2.0f: %20s -> %-20s Parent: %s\n", m.Data["layer"], m.Addr, m.Data["self"], m.Data["parent"])
 }
