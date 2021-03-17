@@ -1,4 +1,4 @@
-package station
+package main
 
 type Getter interface {
 	Get() interface{}

@@ -1,7 +1,7 @@
 //
 // station is a program
 //
-package station
+package main
 
 import (
 	"log"

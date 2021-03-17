@@ -1,4 +1,4 @@
-package station
+package main
 
 import (
 	"fmt"
@@ -37,7 +37,7 @@ func mqtt_connect() {
 // ToCloudCB is the callback when we recieve MQTT messages on the '/mesh/xxxxxx/toCloud' channel. 
 func ToCloudCB(mc mqtt.Client, msg mqtt.Message) {
 	if config.Debug {
-		log.Printf("Incoming message topic: %s\n", msg.Topic());		
+		log.Printf("Incoming message topic: %s\n", msg.Topic());
 	}
 
 	paths := strings.Split(msg.Topic(), "/");
