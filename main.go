@@ -41,6 +41,7 @@ func main() {
 	st.Register("/ping", Ping{})
 	st.Register("/config", Configuration{})
 
+	// Subscribe to MQTT channels
 	st.Subscribe("mesh/+/toCloud", ToCloudCB)
 
 	// ----------------------------------------------------------
