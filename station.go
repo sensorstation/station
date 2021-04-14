@@ -1,7 +1,7 @@
 //
 // station is a program
 //
-package station
+package main
 
 import (
 	"log"
@@ -80,12 +80,6 @@ func (s *Station) Start() error {
 
 	log.Println("Starting station Web and REST server on ", s.Addr)
 	return http.ListenAndServe(s.Addr, nil)
-}
-
-// NewPublisher adds a publisher to the station, which will subsequently
-// start publishing the data
-func (s *Station) AddPublisher(path string, r Getter) {
-	s.Publishers[path] = NewPublisher(path, r)
 }
 
 // NewPublisher adds a publisher to the station, which will subsequently

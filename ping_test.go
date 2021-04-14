@@ -1,4 +1,4 @@
-package station
+package main
 
 import (
 	"io/ioutil"

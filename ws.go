@@ -1,4 +1,4 @@
-package station
+package main
 
 import (
 	"context"
@@ -74,7 +74,6 @@ func (ws WSServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					log.Println("ERROR: ", err)
 					running = false
 				}
-				
 				tf := KeyVal{ K: "tempf", V: 88 }
 				sl := KeyVal{ K: "soil", V: .49 }
 				lt := KeyVal{ K: "light", V: .62 }
@@ -82,7 +81,7 @@ func (ws WSServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				err = wsjson.Write(r.Context(), c, tf)
 				err = wsjson.Write(r.Context(), c, sl)
 				err = wsjson.Write(r.Context(), c, lt)
-				err = wsjson.Write(r.Context(), c, hu)				
+				err = wsjson.Write(r.Context(), c, hu)
 			}
 		}
 	}()
