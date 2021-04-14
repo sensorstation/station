@@ -7,7 +7,7 @@ import (
 	"strings"
 	"encoding/json"
 
-	MQTT "github.com/eclipse/paho.mqtt.golang"
+	//MQTT "github.com/eclipse/paho.mqtt.golang"
 )
 
 // MeshNetwork represents a network of devices that have meshed up.
@@ -52,12 +52,11 @@ type MeshRouter struct {
 // to keep track of our inventory fleet.
 type MeshNode struct {
 	Self     string
-	Parent   *MeshNode
-	Children map[string]*MeshNode
+	Parent   string
 	Layer    int
+	Children map[string]string
 
 	Station
-
 	Updated time.Time
 }
 
@@ -68,7 +67,7 @@ func NewNode(d map[string]interface{}) *MeshNode {
 
 	mn := &MeshNode{
 		Self:    self,
-		Parent:  pnode,
+		Parent:  pnode.Self,
 		Layer:   int(d["layer"].(float64)),
 		Updated: time.Now(),
 	}
@@ -76,16 +75,16 @@ func NewNode(d map[string]interface{}) *MeshNode {
 }
 
 func (n *MeshNode) UpdateParent(p *MeshNode) {
-	if (n.Parent != p) {
-		log.Printf("n.Parent has changed from %s -> %s\n", n.Parent, p)
+	if (n.Parent != p.Self) {
+		log.Printf("n.Parent has changed from %s -> %s\n", n.Parent, p.Self)
 	}
-	n.Parent = p		
+	n.Parent = p.Self
 }
 
 func (n *MeshNode) UpdateChild(c *MeshNode) {
 	log.Print("Parent ", n.Self)
 	if (n.Children == nil) {
-		n.Children = make(map[string]*MeshNode)
+		n.Children = make(map[string]string)
 	}
 
 	if _, e := n.Children[c.Self]; e {
@@ -93,7 +92,7 @@ func (n *MeshNode) UpdateChild(c *MeshNode) {
 	} else {
 		log.Println(" ADDING NEW child ")
 	}
-	n.Children[c.Self] = c
+	n.Children[c.Self] = c.Self
 	log.Println(c.Self)
 }
 
@@ -105,12 +104,11 @@ func (n *MeshNode) String() string {
 		return str
 	}
 	str += "Chilren:\n"
-	for _, n := range n.Children {
-		str += "\t" + n.Self + "\n"
+	for _, mn := range n.Children {
+		str += "\t" + mn + "\n"
 	}
 	return str
 }
-
 
 type MeshMessage struct {
 	Addr string `json:"addr"`
@@ -123,52 +121,6 @@ type MeshHeartBeat struct {
 	Self   string `json:"self"`   // macaddr of advertising node
 	Parent string `json:"parent"` // macaddr of parent
 	Layer  int    `json:"layer"`  // node layer
-}
-
-
-// This handles the mesh networking part of this system
-func mesh_subscribe(client MQTT.Client) {
-	topic := "mesh/+/toCloud"
-	qos := 0
-	if token := client.Subscribe(topic, byte(qos), onMessageToCloud); token.Wait() && token.Error() != nil {
-		panic(token.Error())
-	}
-	log.Println("subscribed to 'mesh/+/tocloud'")
-}
-
-// onMessageToCloud is call everytime a control message is sent
-// to the mesh/+/tocloud channel where the '+' wildcard represents
-// the station ID of the sender. The msg["data"] field tells us
-// the type of data message (heartbeat).
-func onMessageToCloud(client MQTT.Client, message MQTT.Message) {
-	if config.Debug {
-		log.Printf("Received message on topic: %s\nMessage: %s\n", message.Topic(), message.Payload())
-	}
-
-	payload := message.Payload()
-	var msg map[string]interface{} = make(map[string]interface{})
-	err := json.Unmarshal(payload, &msg)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	data, e := msg["data"]
-	if !e {
-		log.Fatal("Unknown message format, expected (type): ", msg["data"])
-	}
-
-	d := data.(map[string]interface{})
-	t, e := d["type"]
-	if !e {
-		log.Fatal("Unknown message format, expected (type): ", data)
-	}
-
-	switch t {
-	case "heartbeat":
-		mesh.Heartbeat(d)
-	default:
-		log.Println("Unknown message type ", t)
-	}
 }
 
 func (mn MeshNetwork) MsgRecv(topic string, payload []byte) {
@@ -194,27 +146,17 @@ func (mn MeshNetwork) MsgRecv(topic string, payload []byte) {
 	switch (msgtype) {
 	case "heartbeat":
 		
-		self, _ := data["self"]
-		parent, _ := data["parent"]
-		layer, _ := data["layer"]
+		self, _ := data["self"].(string)
+		parent, _ := data["parent"].(string)
+		layer, _ := data["layer"].(int)
+		mesh.Update(rootid, self, parent, layer)
 
-		mesh.UpdateRoot(rootid)
-		node := mesh.GetNode(self.(string))
-		if node == nil {
-			log.Fatalln("GetNode returned nil for ", self)
-		}
-
-		if (node.Layer != layer) {
-			log.Println("Node has changed layers from %d -> %d ", node.Layer, layer)
-		}
-
-		pnode := mesh.GetNode(parent.(string))
-		if pnode == nil {
-			log.Fatalln("GetParent returned nil for ", parent)
-		}
-
-		pnode.UpdateChild(node)
-		node.UpdateParent(pnode)
+	case "env":
+		fmt.Printf("data %+v\n", data)
+		tempc := data["tempc"]
+		humid := data["humidity"]
+		tstempc.Add(tempc.(float64))
+		tshumid.Add(humid.(float64))
 
 	default:
 		log.Fatalln("Unknown message type: ", msgtype)
@@ -237,4 +179,25 @@ func (mn MeshNetwork) Heartbeat(data map[string]interface{}) {
 		n.Updated = time.Now()
 	}
 	fmt.Println(node.String())
+}
+
+
+func (mn MeshNetwork) Update(rootid, id, parent string, layer int) {
+		mesh.UpdateRoot(rootid)
+		node := mesh.GetNode(id)
+		if node == nil {
+			log.Fatalln("GetNode returned nil for ", id)
+		}
+
+		if (node.Layer != layer) {
+			log.Printf("Node has changed layers from %d -> %d ", node.Layer, layer)
+		}
+
+		pnode := mesh.GetNode(parent)
+		if pnode == nil {
+			log.Fatalln("GetParent returned nil for ", parent)
+		}
+
+		pnode.UpdateChild(node)
+		node.UpdateParent(pnode)
 }

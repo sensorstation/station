@@ -84,12 +84,6 @@ func (s *Station) Start() error {
 
 // NewPublisher adds a publisher to the station, which will subsequently
 // start publishing the data
-func (s *Station) AddPublisher(path string, r Getter) {
-	s.Publishers[path] = NewPublisher(path, r)
-}
-
-// NewPublisher adds a publisher to the station, which will subsequently
-// start publishing the data
 func (s *Station) AddApplication(app Application) {
 	name := app.Name()
 	if s.Applications == nil {

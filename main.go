@@ -2,12 +2,15 @@ package main
 
 import (
 	"flag"
+	"time"
 )
 
 // Globals
 var (
 	config Configuration
 	mesh MeshNetwork
+	tstempc Timeseries
+	tshumid Timeseries
 )
 
 func init() {
@@ -22,6 +25,12 @@ func init() {
 
 	mesh = MeshNetwork{
 		Nodes: make(map[string]*MeshNode),
+	}
+	tstempc = Timeseries{
+		Vals: make(map[time.Time]float64, 256),
+	}
+	tshumid = Timeseries{
+		Vals: make(map[time.Time]float64, 256),
 	}
 }
 

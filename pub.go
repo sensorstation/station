@@ -10,15 +10,13 @@ import (
 type Publisher struct {
 	Path   string
 	Period time.Duration
-	Getter
 	publishing bool
 }
 
-func NewPublisher(p string, r Getter) (pub *Publisher) {
+func NewPublisher(p string) (pub *Publisher) {
 	pub = &Publisher{
 		Path:   p,
 		Period: 5 * time.Second,
-		Getter: r,
 	}
 	return pub
 }
@@ -40,7 +38,7 @@ func (p *Publisher) Publish(done chan string) {
 				break
 
 			case <-ticker.C:
-				d := p.Get()
+				d := "Hello"
 				if d != "" {
 					if t := mqttc.Publish(p.Path, byte(0), false, d); t == nil {
 						if config.Debug {
