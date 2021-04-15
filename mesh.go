@@ -24,7 +24,7 @@ func (m *MeshNetwork) GetNode(nid string) (mn *MeshNode) {
 	var e bool
 
 	if mn, e = m.Nodes[nid]; !e {
-		mn = &MeshNode{Self: nid}
+		mn = &MeshNode{Id: nid}
 	}
 	return mn
 }
@@ -51,12 +51,10 @@ type MeshRouter struct {
 // MeshNode represents a single node in the ESP-MESH network, this allows us
 // to keep track of our inventory fleet.
 type MeshNode struct {
-	Self     string
+	Id     string
 	Parent   string
 	Layer    int
 	Children map[string]string
-
-	Station
 	Updated time.Time
 }
 
@@ -66,8 +64,8 @@ func NewNode(d map[string]interface{}) *MeshNode {
 	pnode := mesh.GetNode(parent)
 
 	mn := &MeshNode{
-		Self:    self,
-		Parent:  pnode.Self,
+		Id:    self,
+		Parent:  pnode.Id,
 		Layer:   int(d["layer"].(float64)),
 		Updated: time.Now(),
 	}
@@ -75,31 +73,30 @@ func NewNode(d map[string]interface{}) *MeshNode {
 }
 
 func (n *MeshNode) UpdateParent(p *MeshNode) {
-	if (n.Parent != p.Self) {
-		log.Printf("n.Parent has changed from %s -> %s\n", n.Parent, p.Self)
+	if (n.Parent != p.Id) {
+		log.Printf("n.Parent has changed from %s -> %s\n", n.Parent, p.Id)
 	}
-	n.Parent = p.Self
+	n.Parent = p.Id
 }
 
 func (n *MeshNode) UpdateChild(c *MeshNode) {
-	log.Print("Parent ", n.Self)
+	log.Print("Parent ", n.Id)
 	if (n.Children == nil) {
 		n.Children = make(map[string]string)
 	}
 
-	if _, e := n.Children[c.Self]; e {
+	if _, e := n.Children[c.Id]; e {
 		log.Println(" update existing child ")
 	} else {
 		log.Println(" ADDING NEW child ")
 	}
-	n.Children[c.Self] = c.Self
-	log.Println(c.Self)
+	n.Children[c.Id] = c.Id
+	log.Println(c.Id)
 }
-
 
 func (n *MeshNode) String() string {
 	str := fmt.Sprintf("NODE self - %s :=: parent - %s :=: layer - %d last update: %q\n",
-		n.Self, n.Parent, n.Layer, n.Updated)
+		n.Id, n.Parent, n.Layer, n.Updated)
 	if len(n.Children) < 1 {
 		return str
 	}
@@ -118,7 +115,7 @@ type MeshMessage struct {
 
 type MeshHeartBeat struct {
 	Typ    string `json:"type"`   // heartbeat
-	Self   string `json:"self"`   // macaddr of advertising node
+	Id   string `json:"self"`   // macaddr of advertising node
 	Parent string `json:"parent"` // macaddr of parent
 	Layer  int    `json:"layer"`  // node layer
 }
@@ -164,40 +161,27 @@ func (mn MeshNetwork) MsgRecv(topic string, payload []byte) {
 }
 
 
-// Heartbeat records the pulse recent sent from the respective station
-// if this is the first time recording the station it will be inserted
-// with a timer, every new message updates the timer. A cleanup timer
-// periodically runs cleaning up all aged stations..
-//
-// TODO The timeout timer
-func (mn MeshNetwork) Heartbeat(data map[string]interface{}) {
-	node := NewNode(data)
-	if n, e := mn.Nodes[node.Self]; !e {
-		mn.Nodes[n.Self] = n
-		log.Printf("We have a new node: %s", n.Self)
-	} else {
-		n.Updated = time.Now()
-	}
-	fmt.Println(node.String())
-}
-
-
 func (mn MeshNetwork) Update(rootid, id, parent string, layer int) {
-		mesh.UpdateRoot(rootid)
-		node := mesh.GetNode(id)
-		if node == nil {
-			log.Fatalln("GetNode returned nil for ", id)
-		}
 
-		if (node.Layer != layer) {
-			log.Printf("Node has changed layers from %d -> %d ", node.Layer, layer)
-		}
+	log.Println("[MESH] Update [id/parent/rootid/layer]: ", id, parent, rootid, layer)
 
-		pnode := mesh.GetNode(parent)
-		if pnode == nil {
-			log.Fatalln("GetParent returned nil for ", parent)
-		}
+	// Get nodes for all the provided values
+	root := mesh.GetNode(rootid)
+	moms := mesh.GetNode(parent)
+	self := mesh.GetNode(id)
 
-		pnode.UpdateChild(node)
-		node.UpdateParent(pnode)
+	// First check to make sure the root has not changed
+	if mn.RootId != root.Id {
+		log.Printf("[MESH] Root %s has changed to %s\n", mn.RootId, root.Id)
+		mn.RootId = root.Id
+	}
+
+	if self.Parent != moms.Id {
+		log.Printf("[MESH] Node %s has a parent change to %s\n", self.Parent, moms.Id)
+		self.Parent = moms.Id
+	}
+
+	if self.Layer != layer {
+		log.Printf("[MESH] Node %s layer has changed from %d to %d\n", self.Id, self.Layer, layer)
+	}
 }

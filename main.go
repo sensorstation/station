@@ -21,7 +21,7 @@ func init() {
 	flag.BoolVar(&config.DebugMQTT, "debug-mqtt", false, "Debugging MQTT messages")
 	flag.BoolVar(&config.FakeWS, "fake-ws", false, "Fake websocket data")
 	flag.StringVar(&config.Filename, "config", "~/.config/sensors.json", "Where to read and store config")
-	flag.BoolVar(&config.GPIO, "gpio", false, "Ignore the GPIO")
+	flag.BoolVar(&config.GPIO, "gpio", false, "Utilise GPIO for Raspberry PI")
 
 	mesh = MeshNetwork{
 		Nodes: make(map[string]*MeshNode),
