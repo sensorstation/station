@@ -25,6 +25,7 @@ func (m *MeshNetwork) GetNode(nid string) (mn *MeshNode) {
 
 	if mn, e = m.Nodes[nid]; !e {
 		mn = &MeshNode{Id: nid}
+		m.Nodes[nid] = mn
 	}
 	return mn
 }
@@ -149,39 +150,41 @@ func (mn MeshNetwork) MsgRecv(topic string, payload []byte) {
 		mesh.Update(rootid, self, parent, layer)
 
 	case "env":
-		fmt.Printf("data %+v\n", data)
-		tempc := data["tempc"]
-		humid := data["humidity"]
-		tstempc.Add(tempc.(float64))
-		tshumid.Add(humid.(float64))
+		if config.Debug {
+			log.Printf("data %+v\n", data)			
+		}
+
+		if tempc, ex := data["tempc"]; ex {
+			tstempc.Add(tempc.(float64))			
+		}
+
+		if humid, ex := data["humidity"]; ex {
+			tshumid.Add(humid.(float64))			
+		}
+
 
 	default:
 		log.Fatalln("Unknown message type: ", msgtype)
 	}
 }
 
-
 func (mn MeshNetwork) Update(rootid, id, parent string, layer int) {
 
-	log.Println("[MESH] Update [id/parent/rootid/layer]: ", id, parent, rootid, layer)
-
-	// Get nodes for all the provided values
-	root := mesh.GetNode(rootid)
-	moms := mesh.GetNode(parent)
-	self := mesh.GetNode(id)
-
-	// First check to make sure the root has not changed
-	if mn.RootId != root.Id {
-		log.Printf("[MESH] Root %s has changed to %s\n", mn.RootId, root.Id)
-		mn.RootId = root.Id
+	if config.Debug {
+		log.Println("[MESH] Update [id/parent/rootid/layer]: ", id, parent, rootid, layer)		
 	}
 
-	if self.Parent != moms.Id {
-		log.Printf("[MESH] Node %s has a parent change to %s\n", self.Parent, moms.Id)
-		self.Parent = moms.Id
+	if mesh.RootId != rootid {
+		log.Printf("[MESH] Root %s has changed to %s\n", mn.RootId, rootid)
+		mesh.RootId = rootid
 	}
 
-	if self.Layer != layer {
-		log.Printf("[MESH] Node %s layer has changed from %d to %d\n", self.Id, self.Layer, layer)
+	node := mesh.GetNode(id)
+	if node == nil || node.Id == "" {
+		node.Parent = parent		
+	}
+
+	if node.Layer != layer {
+		log.Printf("[MESH] Node %s layer has changed from %d to %d\n", node.Id, node.Layer, layer)
 	}
 }
