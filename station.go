@@ -30,7 +30,7 @@ type Station struct {
 // The ID will be populated with the MAC address of this node
 func NewStation(cfg *Configuration) (s *Station) {
 	s = &Station{
-		ID:          "0xdeadcafe", // MUST get MAC Address
+		ID:          "0xdeadcafe", // MUST get MAC Address - and WIFI SSID
 		Addr:        cfg.Addr,
 		Publishers:  make(map[string]*Publisher, 10),
 		Subscribers: make(map[string]*Subscriber, 10),

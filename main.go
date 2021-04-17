@@ -48,7 +48,8 @@ func main() {
 	// Register our REST callbacks, specifically answer to pings
 	st.Register("/ws", WServ)
 	st.Register("/ping", Ping{})
-	st.Register("/config", Configuration{})
+	st.Register("/api/config", Configuration{})
+	st.Register("/api/mesh", MeshNetwork{})
 
 	// Subscribe to MQTT channels
 	st.Subscribe("mesh/+/toCloud", ToCloudCB)

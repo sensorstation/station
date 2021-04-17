@@ -6,6 +6,7 @@ import (
 	"time"
 	"strings"
 	"encoding/json"
+	"net/http"
 
 	//MQTT "github.com/eclipse/paho.mqtt.golang"
 )
@@ -41,6 +42,23 @@ func (m *MeshNetwork) UpdateRoot(rootid string) {
 		mesh.RootId = rootid
 	}
 }
+
+
+// ServeHTTP provides a REST interface to the config structure
+func (m MeshNetwork) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	r.ParseForm()
+	switch r.Method {
+	case "GET":
+		json.NewEncoder(w).Encode(mesh)
+
+	case "POST", "PUT":
+		// TODO
+		http.Error(w, "Not Yet Supported", 401)
+	}
+}
+
 
 // MeshRouter is the optional IP router for the mesh network
 type MeshRouter struct {
